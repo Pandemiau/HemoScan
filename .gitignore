@@ -1,0 +1,14 @@
+# Entornos Virtuales y Compilados
+venv/
+env/
+build/
+dist/
+__pycache__/
+*.py[cod]
+*$py.class
+*.spec
+
+# Evidencia Médica y Bases de Datos
+reportes_historicos/
+*.sqlite3
+historial_medico.csv
