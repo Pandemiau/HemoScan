@@ -3,50 +3,51 @@ from mysql.connector import Error
 
 class DatabaseManager:
     """
-    Gestor de base de datos para HemoScan.
-    Aplica el principio de Responsabilidad Única (SRP). Este módulo
-    no sabe nada de cámaras ni de Tkinter, solo se encarga de la persistencia de datos.
+    Database manager for HemoScan.
+    Applies the Single Responsibility Principle (SRP). This module
+    handles solely data persistence, isolated from UI or camera logic.
     """
     
     def __init__(self, host="localhost", user="root", password="", database="hemoscan_db"):
-        # Inicializamos las credenciales. En un entorno real, esto vendría de variables de entorno (.env)
+        # Initialize credentials. In production, these should load from environment variables (.env)
         self.host = host
         self.user = user
         self.password = password
         self.database = database
 
-    def guardar_historial(self, fecha_mysql, nombre_paciente, porcentaje_rojo, diagnostico, firma_digital, porcentaje_amarillo, diagnostico_higado):
-        """Abre conexión, guarda el registro biométrico dual y cierra la conexión de forma segura."""
+    def save_history(self, scan_date, patient_name, red_percentage, diagnosis, digital_signature, yellow_percentage, liver_diagnosis):
+        """Opens connection, saves the dual biometric record, and safely closes the connection."""
         try:
-            # 1. Establecer conexión aislada
-            conexion = mysql.connector.connect(
+            # 1. Establish isolated connection
+            connection = mysql.connector.connect(
                 host=self.host,
                 user=self.user,
                 password=self.password,
                 database=self.database
             )
-            cursor = conexion.cursor()
+            cursor = connection.cursor()
             
-            # 2. Preparar el comando SQL limpio (Previene inyecciones SQL)
-            comando_sql = (
+            # 2. Prepare clean SQL command (Prevents SQL injection)
+            # Note: Database schema names kept in original language for backward compatibility
+            sql_command = (
                 "INSERT INTO historial_clinico "
                 "(fecha_escaneo, nombre, porcentaje_rojo, diagnostico, firma_digital, porcentaje_amarillo, diagnostico_higado) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s)"
             )
             
-            # 3. Asignar los valores recibidos por el sensor
-            valores = (fecha_mysql, nombre_paciente, porcentaje_rojo, diagnostico, firma_digital, porcentaje_amarillo, diagnostico_higado)
+            # 3. Assign values received from the sensor
+            values = (scan_date, patient_name, red_percentage, diagnosis, digital_signature, yellow_percentage, liver_diagnosis)
             
-            # 4. Ejecutar y consolidar
-            cursor.execute(comando_sql, valores)
-            conexion.commit()
-            print("INFO [DB_MANAGER]: Registro biométrico asegurado exitosamente en MySQL.")
+            # 4. Execute and commit
+            cursor.execute(sql_command, values)
+            connection.commit()
+            print("INFO [DB_MANAGER]: Biometric record successfully secured in MySQL.")
             
         except Error as e:
-            # Tolerancia a fallos: Registramos el error sin crashear todo el programa visual
-            print(f"CRITICAL ERROR [DB_MANAGER]: Fallo de persistencia en MySQL -> {e}")
+            # Fault tolerance: Log the error without crashing the visual pipeline
+            print(f"CRITICAL ERROR [DB_MANAGER]: MySQL persistence failure -> {e}")
         finally:
-            # Watchdog de limpieza: Garantiza que el puerto se cierre incluso si hay un fallo
-            if 'conexion' in locals() and conexion.is_connected():
+            # Cleanup watchdog: Ensures the port is closed even if a failure occurs
+            if 'connection' in locals() and connection.is_connected():
                 cursor.close()
-                conexion.close()
+                connection.close()
