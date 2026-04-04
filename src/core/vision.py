@@ -23,6 +23,7 @@ class VisionEngine:
         # Telemetry Stabilizers (State variables)
         self.percentage_history = []
         self.scanning_counter = 0
+        self.live_graph_history = [] # <--- NUEVA LÍNEA PARA EL COSITO
         
         print("SYSTEM [VISION_ENGINE]: Optical sensors and Face Mesh initialized.")
 
@@ -164,6 +165,26 @@ class VisionEngine:
                         self.scanning_counter = 0
                     laser_y = y_min + self.scanning_counter
                     cv2.line(frame, (x_min, laser_y), (x_max, laser_y), (0, 255, 0), 2)
+
+                    # ==========================================
+                # 5. LIVE TELEMETRY MONITOR (El "Cosito")
+                # ==========================================
+                self.live_graph_history.append(stabilized_red)
+                if len(self.live_graph_history) > 100:
+                    self.live_graph_history.pop(0)
+                
+                # Fondo y borde del monitor
+                cv2.rectangle(frame, (w - 230, h - 130), (w - 20, h - 20), (0, 0, 0), cv2.FILLED)
+                cv2.rectangle(frame, (w - 230, h - 130), (w - 20, h - 20), (0, 255, 255), 1)
+                cv2.putText(frame, 'TELEMETRIA EN VIVO', (w - 225, h - 135), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (0, 255, 255), 1)
+                
+                # Trazado de la gráfica
+                for i in range(1, len(self.live_graph_history)):
+                    x_prev = w - 230 + (i - 1) * 2
+                    x_curr = w - 230 + i * 2
+                    y_prev = h - 20 - int((self.live_graph_history[i-1] / 100) * 100)
+                    y_curr = h - 20 - int((self.live_graph_history[i] / 100) * 100)
+                    cv2.line(frame, (x_prev, y_prev), (x_curr, y_curr), text_color, 2)
 
         # Return the fully annotated frame and the pure biometric data
         return frame, stabilized_red, yellow_percentage, anemia_diagnosis, liver_diagnosis, text_color, liver_color
