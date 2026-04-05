@@ -15,8 +15,8 @@ class DatabaseManager:
         self.password = password
         self.database = database
 
-    def save_history(self, scan_date, patient_name, red_percentage, diagnosis, digital_signature, yellow_percentage, liver_diagnosis):
-        """Opens connection, saves the dual biometric record, and safely closes the connection."""
+    def save_history(self, scan_date, patient_name, red_percentage, diagnosis, digital_signature, yellow_percentage, liver_diagnosis, pupil_diagnosis):
+        """Opens connection, saves the multi-biometric record, and safely closes the connection."""
         try:
             # 1. Establish isolated connection
             connection = mysql.connector.connect(
@@ -28,15 +28,15 @@ class DatabaseManager:
             cursor = connection.cursor()
             
             # 2. Prepare clean SQL command (Prevents SQL injection)
-            # Note: Database schema names kept in original language for backward compatibility
+            # Note: Added 'diagnostico_pupila' to support the new Neurology module
             sql_command = (
                 "INSERT INTO historial_clinico "
-                "(fecha_escaneo, nombre, porcentaje_rojo, diagnostico, firma_digital, porcentaje_amarillo, diagnostico_higado) "
-                "VALUES (%s, %s, %s, %s, %s, %s, %s)"
+                "(fecha_escaneo, nombre, porcentaje_rojo, diagnostico, firma_digital, porcentaje_amarillo, diagnostico_higado, diagnostico_pupila) "
+                "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             )
             
             # 3. Assign values received from the sensor
-            values = (scan_date, patient_name, red_percentage, diagnosis, digital_signature, yellow_percentage, liver_diagnosis)
+            values = (scan_date, patient_name, red_percentage, diagnosis, digital_signature, yellow_percentage, liver_diagnosis, pupil_diagnosis)
             
             # 4. Execute and commit
             cursor.execute(sql_command, values)
