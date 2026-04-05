@@ -14,6 +14,8 @@ import pathlib
 import mysql.connector
 import winsound
 import time
+import os
+from dotenv import load_dotenv
 
 class SystemNotifier:
     """Handles asynchronous background tasks like Voice Synthesis and Email delivery."""
@@ -30,10 +32,11 @@ class SystemNotifier:
     @staticmethod
     def send_email_async(target_email, pdf_path, patient_name):
         def _email_thread():
+            load_dotenv() # Carga la caja fuerte invisible (.env)
             try:
                 print(f"SYSTEM [NOTIFIER]: Initiating secure transmission to {target_email}...")
-                sender = "jorgebarriosxd14@gmail.com"  
-                password = "TU_APP_PASSWORD_AQUI" # SECURITY WARNING: Move to .env file later
+                sender = os.getenv("SENDER_EMAIL")  
+                password = os.getenv("EMAIL_PASSWORD") 
 
                 msg = MIMEMultipart()
                 msg['From'] = sender
