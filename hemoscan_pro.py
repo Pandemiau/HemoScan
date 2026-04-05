@@ -47,8 +47,8 @@ def enviar_correo_silencioso(correo_destino, archivo_pdf_adjunto):
         print(f"🚀 Iniciando hilo secundario: Enviando correo a {correo_destino}...")
         
         # 1. Configurar credenciales
-        remitente = "jorgebarriosxd14@gmail.com"  # <--- ¡OJO! Pon tu correo aquí
-        password = "iucp ajfo pqft eabq" # <--- ¡OJO! Pon tu contraseña aquí
+        remitente = "TU_CORREO_AQUI"  # <--- ¡OJO! Pon tu correo aquí
+        password = "TU_CONTRASENA_AQUI" # <--- ¡OJO! Pon tu contraseña aquí
 
         # 2. Crear el mensaje
         msg = MIMEMultipart()
