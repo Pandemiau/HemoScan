@@ -15,9 +15,10 @@ HemoScan was engineered to democratize medical diagnostics. By transforming a st
 
 Furthermore, as my focus expands toward **Aerospace Engineering**, this project serves as a foundational prototype for **Space Medicine and Telemetry**. The parallels are clear: in isolated environments—whether a remote rural village or a deep-space habitat—traditional clinical laboratories are simply unviable. Non-invasive, camera-based diagnostic algorithms like HemoScan represent the future of autonomous crew health monitoring.
 
-The engine currently processes two primary telemetry streams:
-1.  **Vascular Module:** Conjunctival Pallor analysis for early Anemia detection.
-2.  **Hepatic Module:** Scleral Icterus analysis for Jaundice detection.
+The engine currently processes three primary telemetry streams:
+1. **Vascular Module:** Conjunctival Pallor analysis for early Anemia detection.
+2. **Hepatic Module:** Scleral Icterus analysis for Jaundice detection.
+3. **Neurological Module:** Euclidean spatial geometry for Miosis and Mydriasis detection (Fatigue/Trauma assessment).
 
 ##  System Architecture (Clean MVC)
 The codebase has been refactored from a monolithic script into an industrial-grade, object-oriented architecture to ensure scalability, fault tolerance, and separation of concerns.
