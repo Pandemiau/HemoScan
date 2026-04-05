@@ -42,8 +42,9 @@ def main():
             frame = cv2.resize(frame, (800, 600))
 
             # 5. Process the frame through the Vision Engine
-            (processed_frame, red_pct, yellow_pct, 
-             anemia_diag, liver_diag, text_color, liver_color) = vision_engine.process_frame(frame)
+            (processed_frame, red_pct, yellow_pct,
+            anemia_diag, liver_diag, text_color, liver_color, 
+            pupil_diag, p_col) = vision_engine.process_frame(frame)
             
             # Apply thermal mode if activated by the controller
             if hw_controller.thermal_mode:
@@ -55,7 +56,8 @@ def main():
             cv2.putText(processed_frame, anemia_diag, (80, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.7, text_color, 1)
             cv2.putText(processed_frame, f"Nivel Ictericia: {yellow_pct}%", (10, 140), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 1)
             cv2.putText(processed_frame, liver_diag, (10, 170), cv2.FONT_HERSHEY_SIMPLEX, 0.7, liver_color, 1)
-
+            cv2.putText(processed_frame, pupil_diag, (10, 200), cv2.FONT_HERSHEY_SIMPLEX, 0.7, p_col, 2)
+            
             cv2.imshow("HemoScan v2.0 - Telemetry Dashboard", processed_frame)
             
             # 6. Route keypresses to the Hardware Controller
