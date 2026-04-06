@@ -12,3 +12,6 @@ __pycache__/
 reportes_historicos/
 *.sqlite3
 historial_medico.csv
+
+# Secretos y credenciales
+.env

@@ -34,4 +34,17 @@ Implement a real-time biometric sensor to detect Miosis (pupil constriction) and
 4. **Clinical Thresholds:** Programmed diagnostic triggers (Normal: ~0.20-0.30, Mydriasis: >0.35, Miosis: <0.18).
 
 ### ✅ Result
-The Vision Engine successfully isolates and tracks pupillary variations, injecting the telemetry stream directly into the live HUD and preparing it for the scalable MySQL persistence layer.
+The Vision Engine successfully isolates and tracks pupillary variations, injecting the telemetry stream directly into the live HUD and preparing it for the scalable MySQL persistence layer.+
+
+## [v1.0-RC] Vision Core & UI Architecture Stabilization
+**Date:** 2026-04-05
+**Module:** `src/core/vision.py`, `main.py`
+**Status:** Desktop Release Candidate ready for WebRTC migration.
+
+### Engineering Notes & Commits:
+* **Illumination Invariance (CLAHE):** Integrated Contrast Limited Adaptive Histogram Equalization to mathematically normalize the luminance channel (V in HSV) within the ocular ROI. This stabilizes detection in low-light rural environments without triggering false positives from shadows.
+* **Hardware-Agnostic HSV Tuning:** Recalibrated saturation thresholds (S=100) to find the strict clinical "sweet spot". This filters out false positives caused by Smartphone Auto-HDR skin enhancements while maintaining high sensitivity for low-tier webcams.
+* **ROI Optimization:** Narrowed the spatial scanning box (`box_width=50, box_height=15, y_offset=5`) to strictly target the palpebral conjunctiva, eliminating cheek-tissue interference.
+* **Dynamic UI Renderer (View Selector):** Refactored `main.py` rendering loop. Implemented a numeric keystroke listener (`0-3`) to toggle specific telemetry overlays (Vascular, Hepatic, Neurological) and relocated the live oscilloscope to prevent central FOV obstruction.
+
+**Next Steps:** Freeze local desktop dependencies (`requirements.txt`) and architect the cloud environment using `streamlit` and `streamlit-webrtc` for remote deployment.

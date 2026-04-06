@@ -31,7 +31,7 @@ class DatabaseManager:
             # Note: Added 'diagnostico_pupila' to support the new Neurology module
             sql_command = (
                 "INSERT INTO historial_clinico "
-                "(fecha_escaneo, nombre, porcentaje_rojo, diagnostico, firma_digital, porcentaje_amarillo, diagnostico_higado, diagnostico_pupila) "
+                "(fecha_escaneo, nombre, porcentaje_rojo, diagnostico, firma_sha256, porcentaje_amarillo, diagnostico_higado, diagnostico_pupila) "
                 "VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             )
             

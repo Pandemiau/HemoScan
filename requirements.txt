@@ -6,3 +6,4 @@ mysql-connector-python
 fpdf
 matplotlib
 pyttsx3
+python-dotenv

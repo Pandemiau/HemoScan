@@ -131,7 +131,7 @@ class HardwareController:
         self.healthy_threshold = 40
         self.thermal_mode = False
 
-    def check_controls(self, key, current_frame, red_pct, yellow_pct, anemia_diag, liver_diag):
+    def check_controls(self, key, current_frame, red_pct, yellow_pct, anemia_diag, liver_diag, pupil_diag):
         """Routes the hardware keypress to the correct sub-system."""
         if key == ord('q'):
             return False # Signal to break loop
@@ -145,13 +145,18 @@ class HardwareController:
             print(f"SYSTEM [HW_CONTROL]: Calibrated. New healthy threshold: {self.healthy_threshold}%")
             winsound.Beep(1000, 100)
             winsound.Beep(1500, 100)
+
+        elif key == ord('b'):
+            print("SYSTEM [HW_CONTROL]: Initiating Pupillary Baseline Calibration...")
+            # Route signal to vision engine via main loop
+            return "CALIBRATE_PUPIL" 
             
         elif key == 32: # SPACEBAR
-            self.execute_capture_sequence(current_frame, red_pct, yellow_pct, anemia_diag, liver_diag)
+            self.execute_capture_sequence(current_frame, red_pct, yellow_pct, anemia_diag, liver_diag, pupil_diag)
             
         return True # Continue loop
 
-    def execute_capture_sequence(self, frame, red_pct, yellow_pct, anemia_diag, liver_diag):
+    def execute_capture_sequence(self, frame, red_pct, yellow_pct, anemia_diag, liver_diag, pupil_diag):
         """The master sequence: Hash -> DB -> PDF -> Email -> Voice."""
         winsound.Beep(2000, 200)
         timestamp_exact = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -160,21 +165,20 @@ class HardwareController:
         signature = self.auth.generate_biometric_signature(self.patient_name, red_pct, yellow_pct, anemia_diag)
         
         # 2. Database Persistence
-        self.db.save_history(timestamp_exact, self.patient_name, red_pct, anemia_diag, signature, yellow_pct, liver_diag)
+        self.db.save_history(timestamp_exact, self.patient_name, red_pct, anemia_diag, signature, yellow_pct, liver_diag, pupil_diag)
         
         # 3. Save Evidence Image
         cv2.imwrite("foto_evidencia.jpg", frame)
         
         # 4. Generate PDF Report
-        pdf_name = self.generate_medical_pdf(timestamp_exact, red_pct, yellow_pct, anemia_diag, liver_diag, signature)
-        
+        pdf_name = self.generate_medical_pdf(timestamp_exact, red_pct, yellow_pct, anemia_diag, liver_diag, pupil_diag, signature)
         # 5. Background Tasks (Email & Voice)
         if self.patient_email:
             SystemNotifier.send_email_async(self.patient_email, pdf_name, self.patient_name)
             
         SystemNotifier.speak(f"Reporte generado para {self.patient_name}. {anemia_diag.replace('ALERTA:', 'Alerta')}")
 
-    def generate_medical_pdf(self, timestamp, red_pct, yellow_pct, anemia_diag, liver_diag, signature):
+    def generate_medical_pdf(self, timestamp, red_pct, yellow_pct, anemia_diag, liver_diag, pupil_diag, signature):
         """Creates the formal FPDF report."""
         pdf = FPDF()
         pdf.add_page()
@@ -185,8 +189,9 @@ class HardwareController:
         pdf.cell(0, 10, txt=f"Fecha: {timestamp}", ln=True)
         pdf.cell(0, 10, txt=f"Conjuntiva (Rojo): {red_pct}% -> {anemia_diag}", ln=True)
         pdf.cell(0, 10, txt=f"Esclera (Amarillo): {yellow_pct}% -> {liver_diag}", ln=True)
+        pdf.cell(0, 10, txt=f"Neurologia (Pupila): {pupil_diag}", ln=True)
         pdf.image("foto_evidencia.jpg", x=60, w=90)
-        pdf.ln(100)
+        pdf.ln(80)
         pdf.set_font("Arial", 'I', 8)
         pdf.cell(0, 10, txt=f"Firma SHA-256: {signature}", ln=True, align='C')
         
