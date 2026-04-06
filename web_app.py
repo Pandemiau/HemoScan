@@ -52,3 +52,19 @@ webrtc_streamer(
         "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
     }
 )
+
+# --- TELEMETRY SUBMISSION LOGIC ---
+st.sidebar.markdown("---")
+if st.sidebar.button("Finalize & Submit Telemetry"):
+    if patient_name and patient_email:
+        # Here we trigger the reporting engine
+        st.sidebar.success(f"Telemetry for {patient_name} captured!")
+        st.balloons()
+        
+        # LOGGING (Technical Trace)
+        print(f"CLOUD_SUBMIT: Data received for {patient_name} ({patient_email})")
+        
+        # Integration point for your existing PDF/Email logic
+        # You will need to wrap your src.core.security logic here later
+    else:
+        st.sidebar.error("Missing patient metadata. Capture aborted.")
