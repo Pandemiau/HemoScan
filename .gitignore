@@ -7,6 +7,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.spec
+*.pdf
 
 # Evidencia Médica y Bases de Datos
 reportes_historicos/
@@ -15,3 +16,4 @@ historial_medico.csv
 
 # Secretos y credenciales
 .env
+
