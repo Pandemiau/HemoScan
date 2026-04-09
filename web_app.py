@@ -3,6 +3,9 @@ import av
 import streamlit as st
 from streamlit_webrtc import webrtc_streamer, VideoProcessorBase
 from src.core.vision import VisionEngine
+import requests
+import json
+from datetime import datetime
 
 # --- CLOUD UI & PATIENT DATA CONFIGURATION ---
 st.set_page_config(page_title="HemoScan Telemetry", layout="wide")
@@ -57,14 +60,29 @@ webrtc_streamer(
 st.sidebar.markdown("---")
 if st.sidebar.button("Finalize & Submit Telemetry"):
     if patient_name and patient_email:
-        # Here we trigger the reporting engine
-        st.sidebar.success(f"Telemetry for {patient_name} captured!")
-        st.balloons()
+        # 1. Empaquetar los datos del paciente y el diagnóstico en formato JSON
+        telemetry_payload = {
+            "patient_name": patient_name,
+            "patient_id": patient_id,
+            "patient_email": patient_email,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "status": "Awaiting final analysis",
+            "source": "Web Interface"
+        }
         
-        # LOGGING (Technical Trace)
-        print(f"CLOUD_SUBMIT: Data received for {patient_name} ({patient_email})")
+        # 2. Tu URL de Firebase (Nota el .json al final, es vital para la API)
+        FIREBASE_URL = "https://hemoscan-cloud-default-rtdb.firebaseio.com/scans.json"
         
-        # Integration point for your existing PDF/Email logic
-        # You will need to wrap your src.core.security logic here later
+        # 3. Disparar los datos a la nube
+        try:
+            response = requests.post(FIREBASE_URL, data=json.dumps(telemetry_payload))
+            if response.status_code == 200:
+                st.sidebar.success(f"Telemetry securely transmitted to Central Node!")
+                st.balloons()
+            else:
+                st.sidebar.error("Error transmitting data to cloud.")
+        except Exception as e:
+            st.sidebar.error(f"Network error: {e}")
+            
     else:
         st.sidebar.error("Missing patient metadata. Capture aborted.")
